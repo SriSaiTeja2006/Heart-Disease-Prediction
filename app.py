@@ -23,12 +23,11 @@ st.markdown(
 )
 st.markdown("---")
 
-# ---------------- DISCLAIMER POPUP ----------------
+# ---------------- DISCLAIMER ----------------
 with st.expander("🏥 Medical Disclaimer"):
     st.warning(
-        "This application is intended for **educational and informational purposes only**. "
-        "It is **not a substitute for professional medical advice, diagnosis, or treatment**. "
-        "Always consult a qualified healthcare provider for medical decisions."
+        "This application is for educational purposes only and does not replace "
+        "professional medical advice. Always consult a healthcare provider."
     )
 
 # ---------------- INPUT SECTION ----------------
@@ -140,24 +139,21 @@ if st.button("🔍 Predict Cardiovascular Risk", use_container_width=True):
 
     st.subheader("🩺 Prediction Result")
 
-    # ---------------- RISK PERCENTAGE METER ----------------
-    st.metric(
-        label="📊 Estimated Risk Percentage",
-        value=f"{risk_prob:.2f} %"
-    )
+    # Risk percentage
+    st.metric("📊 Estimated Risk Percentage", f"{risk_prob:.2f} %")
 
     if prediction[0] == 1:
         st.error(
             "⚠️ **High Risk of Cardiovascular Disease**\n\n"
-            "Immediate medical consultation is recommended."
+            "Please consult a healthcare professional immediately."
         )
     else:
         st.success(
             "✅ **Low Risk of Cardiovascular Disease**\n\n"
-            "Continue maintaining a healthy lifestyle."
+            "Maintain a healthy lifestyle and regular medical checkups."
         )
 
-    # ---------------- FEATURE IMPORTANCE EXPLANATION ----------------
+    # ---------------- FEATURE EXPLANATION ----------------
     st.markdown("---")
     st.subheader("🧠 Key Factors Influencing Prediction")
 
@@ -166,17 +162,17 @@ if st.button("🔍 Predict Cardiovascular Risk", use_container_width=True):
     if age > 50:
         explanations.append("• Higher age increases cardiovascular risk.")
     if systolic_bp > 140 or diastolic_bp > 90:
-        explanations.append("• Elevated blood pressure is a major risk factor.")
+        explanations.append("• Elevated blood pressure increases heart disease risk.")
     if cholesterol > 1:
-        explanations.append("• High cholesterol contributes to heart disease.")
+        explanations.append("• High cholesterol contributes to cardiovascular disease.")
     if glucose > 1:
-        explanations.append("• Increased glucose levels raise cardiovascular risk.")
+        explanations.append("• Elevated glucose levels increase cardiovascular risk.")
     if smoking == 1:
-        explanations.append("• Smoking significantly increases heart disease risk.")
+        explanations.append("• Smoking is a major risk factor for heart disease.")
     if alcohol == 1:
-        explanations.append("• Alcohol consumption may impact heart health.")
+        explanations.append("• Alcohol consumption may negatively affect heart health.")
     if physical_activity == 0:
-        explanations.append("• Lack of physical activity is a risk factor.")
+        explanations.append("• Low physical activity increases cardiovascular risk.")
     if bmi >= 30:
         explanations.append("• Obesity is strongly associated with heart disease.")
 
@@ -184,7 +180,7 @@ if st.button("🔍 Predict Cardiovascular Risk", use_container_width=True):
         for exp in explanations:
             st.write(exp)
     else:
-        st.write("• All major health indicators are within normal range.")
+        st.write("• All major health indicators are within normal ranges.")
 
 # ---------------- FOOTER ----------------
 st.markdown("---")
@@ -192,8 +188,3 @@ st.markdown(
     "<center>Machine Learning Project | Streamlit Medical Dashboard</center>",
     unsafe_allow_html=True
 )
-
-    "<center>Machine Learning Project | Streamlit Medical Dashboard</center>",
-    unsafe_allow_html=True
-)
-
