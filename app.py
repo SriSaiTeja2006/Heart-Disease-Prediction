@@ -134,12 +134,18 @@ if st.button("🔍 Predict Cardiovascular Risk", use_container_width=True):
 
     input_scaled = scaler.transform(input_data)
 
+    # Prediction
     prediction = model.predict(input_scaled)
-    risk_prob = model.predict_proba(input_scaled)[0][1] * 100
+
+    # -------- SAFE RISK PERCENTAGE (SVM FIX) --------
+    if hasattr(model, "predict_proba"):
+        risk_prob = model.predict_proba(input_scaled)[0][1] * 100
+    else:
+        decision_score = model.decision_function(input_scaled)[0]
+        risk_prob = (1 / (1 + np.exp(-decision_score))) * 100
 
     st.subheader("🩺 Prediction Result")
 
-    # Risk percentage
     st.metric("📊 Estimated Risk Percentage", f"{risk_prob:.2f} %")
 
     if prediction[0] == 1:
