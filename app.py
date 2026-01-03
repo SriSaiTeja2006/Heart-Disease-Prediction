@@ -23,11 +23,20 @@ st.markdown(
 )
 st.markdown("---")
 
+# ---------------- DISCLAIMER POPUP ----------------
+with st.expander("🏥 Medical Disclaimer"):
+    st.warning(
+        "This application is intended for **educational and informational purposes only**. "
+        "It is **not a substitute for professional medical advice, diagnosis, or treatment**. "
+        "Always consult a qualified healthcare provider for medical decisions."
+    )
+
 # ---------------- INPUT SECTION ----------------
 st.subheader("🧾 Patient Health Parameters")
 
 col1, col2 = st.columns(2)
 
+# ---------- COLUMN 1 ----------
 with col1:
     age = st.slider("Age (Years)", 18, 100, 40)
 
@@ -41,30 +50,39 @@ with col1:
         "Systolic Blood Pressure (mmHg)", 80, 200, 120
     )
 
-    cholesterol = st.selectbox(
+    cholesterol_text = st.selectbox(
         "Cholesterol Level",
         ["Normal", "Above Normal", "Well Above Normal"]
     )
-    cholesterol = {"Normal": 1, "Above Normal": 2, "Well Above Normal": 3}[cholesterol]
+    cholesterol = {
+        "Normal": 1,
+        "Above Normal": 2,
+        "Well Above Normal": 3
+    }[cholesterol_text]
 
+# ---------- COLUMN 2 ----------
 with col2:
     diastolic_bp = st.slider(
         "Diastolic Blood Pressure (mmHg)", 50, 130, 80
     )
 
-    glucose = st.selectbox(
+    glucose_text = st.selectbox(
         "Glucose Level",
         ["Normal", "Above Normal", "Well Above Normal"]
     )
-    glucose = {"Normal": 1, "Above Normal": 2, "Well Above Normal": 3}[glucose]
+    glucose = {
+        "Normal": 1,
+        "Above Normal": 2,
+        "Well Above Normal": 3
+    }[glucose_text]
 
-    smoking = st.slider("Smoking Habit (%)", 0, 100, 0)
-    smoking = 1 if smoking > 0 else 0
+    smoking_text = st.selectbox("Smoking Habit", ["No", "Yes"])
+    smoking = 1 if smoking_text == "Yes" else 0
 
-    alcohol = st.slider("Alcohol Consumption (%)", 0, 100, 0)
-    alcohol = 1 if alcohol > 0 else 0
+    alcohol_text = st.selectbox("Alcohol Consumption", ["No", "Yes"])
+    alcohol = 1 if alcohol_text == "Yes" else 0
 
-    physical_activity = st.selectbox(
+    physical_activity_text = st.selectbox(
         "Physical Activity Level",
         ["Inactive", "Moderately Active", "Highly Active"]
     )
@@ -72,7 +90,29 @@ with col2:
         "Inactive": 0,
         "Moderately Active": 1,
         "Highly Active": 1
-    }[physical_activity]
+    }[physical_activity_text]
+
+# ---------------- BMI CALCULATION ----------------
+st.markdown("---")
+st.subheader("🧮 Body Mass Index (BMI)")
+
+height_m = height / 100
+bmi = round(weight / (height_m ** 2), 2)
+
+bmi_col1, bmi_col2 = st.columns(2)
+
+with bmi_col1:
+    st.metric("BMI Value", bmi)
+
+with bmi_col2:
+    if bmi < 18.5:
+        st.info("Underweight")
+    elif 18.5 <= bmi < 25:
+        st.success("Normal Weight")
+    elif 25 <= bmi < 30:
+        st.warning("Overweight")
+    else:
+        st.error("Obese")
 
 # ---------------- PREDICTION ----------------
 st.markdown("---")
@@ -94,24 +134,65 @@ if st.button("🔍 Predict Cardiovascular Risk", use_container_width=True):
     ]])
 
     input_scaled = scaler.transform(input_data)
+
     prediction = model.predict(input_scaled)
+    risk_prob = model.predict_proba(input_scaled)[0][1] * 100
 
     st.subheader("🩺 Prediction Result")
+
+    # ---------------- RISK PERCENTAGE METER ----------------
+    st.metric(
+        label="📊 Estimated Risk Percentage",
+        value=f"{risk_prob:.2f} %"
+    )
 
     if prediction[0] == 1:
         st.error(
             "⚠️ **High Risk of Cardiovascular Disease**\n\n"
-            "Please consult a healthcare professional for further evaluation."
+            "Immediate medical consultation is recommended."
         )
     else:
         st.success(
             "✅ **Low Risk of Cardiovascular Disease**\n\n"
-            "Maintain a healthy lifestyle and regular medical checkups."
+            "Continue maintaining a healthy lifestyle."
         )
+
+    # ---------------- FEATURE IMPORTANCE EXPLANATION ----------------
+    st.markdown("---")
+    st.subheader("🧠 Key Factors Influencing Prediction")
+
+    explanations = []
+
+    if age > 50:
+        explanations.append("• Higher age increases cardiovascular risk.")
+    if systolic_bp > 140 or diastolic_bp > 90:
+        explanations.append("• Elevated blood pressure is a major risk factor.")
+    if cholesterol > 1:
+        explanations.append("• High cholesterol contributes to heart disease.")
+    if glucose > 1:
+        explanations.append("• Increased glucose levels raise cardiovascular risk.")
+    if smoking == 1:
+        explanations.append("• Smoking significantly increases heart disease risk.")
+    if alcohol == 1:
+        explanations.append("• Alcohol consumption may impact heart health.")
+    if physical_activity == 0:
+        explanations.append("• Lack of physical activity is a risk factor.")
+    if bmi >= 30:
+        explanations.append("• Obesity is strongly associated with heart disease.")
+
+    if explanations:
+        for exp in explanations:
+            st.write(exp)
+    else:
+        st.write("• All major health indicators are within normal range.")
 
 # ---------------- FOOTER ----------------
 st.markdown("---")
 st.markdown(
+    "<center>Machine Learning Project | Streamlit Medical Dashboard</center>",
+    unsafe_allow_html=True
+)
+
     "<center>Machine Learning Project | Streamlit Medical Dashboard</center>",
     unsafe_allow_html=True
 )
